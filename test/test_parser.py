@@ -16,6 +16,7 @@ def test__content_type__saal():
     assert data['total'] == '11,10'
     assert data['date'] == '10.07.2017'
 
+
 def test__content_type__post():
     with open('inputs/Post.txt', 'rt') as txtfile:
         txt = txtfile.read()
