@@ -16,6 +16,17 @@ def test__content_type__saal():
     assert data['total'] == '11,10'
     assert data['date'] == '10.07.2017'
 
+def test__content_type__post():
+    with open('inputs/Post.txt', 'rt') as txtfile:
+        txt = txtfile.read()
+
+    content_type = CONTENT_TYPE_BY_NAME['Post']
+    assert content_type.match(txt)
+
+    data = content_type.extract(txt)
+    assert data['total'] == '3,00'
+    assert data['date'] == '02.01.17'
+
 
 def test__recognize_pdf_text__saal(output_dir):
     yml = os.path.join(output_dir, 'Saal.yml')

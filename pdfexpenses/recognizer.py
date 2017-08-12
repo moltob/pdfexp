@@ -31,7 +31,10 @@ class ContentType:
         match = re.search(self.extractor, txt, re.MULTILINE | re.DOTALL)
         if not match:
             raise RecognitionFailedError(self.name)
-        return match.groupdict()
+
+        data = dict(recognizer=self.name)
+        data.update(match.groupdict())
+        return data
 
 
 CONTENT_TYPES = [
@@ -39,6 +42,11 @@ CONTENT_TYPES = [
         'Saal',
         r'www\.saal-digital\.de',
         r'Rechnungsdatum\:\s*(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamtbetrag\:\s*(?P<total>\d+,\d{2})'
+    ),
+    ContentType(
+        'Post',
+        r'Deutsche\s+Post\s+AG.*Postwertzeichen\s+ohne\s+Zuschlag',
+        r'(?P<date>\d{2}\.\d{2}\.\d{2}).*Bruttoumsatz\s+\*(?P<total>\d+,\d{2})\s+EUR'
     )
 ]
 
