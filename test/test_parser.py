@@ -2,7 +2,7 @@ import os
 
 import yaml
 
-from pdfexpenses.parser import CONTENT_TYPE_BY_NAME, recognize_pdf_text
+from pdfexpenses.recognizer import CONTENT_TYPE_BY_NAME, recognize_pdf_text
 
 
 def test__content_type__saal():
