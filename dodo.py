@@ -3,9 +3,11 @@ import os
 
 import doit.tools
 
+from pdfexpenses.parser import recognize_pdf_text
+
 PDFTOTEXT = r'pdftotext.exe'
 
-INPUT_DIR = r'q:\Privat\Rechnungen\00_Sonstige'
+INPUT_DIR = r'q:\Britta Pagel Fotografie\Fremdleistungen\Saal Digital'
 OUTPUT_DIR = r'd:\Temp\dodoout'
 
 PDF_PATHS = glob.glob(os.path.join(INPUT_DIR, '**', '*.pdf'), recursive=True)
@@ -50,7 +52,7 @@ def task_extract():
             file_dep=[txt_path],
             targets=[yml_path],
             clean=True,
-            actions=['copy "%(dependencies)s" "%(targets)s"'],
+            actions=[(recognize_pdf_text, (), {'pdf_path': pdf_path})],
         )
         yml_paths.append(yml_path)
 
