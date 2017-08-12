@@ -29,17 +29,16 @@ def task_extract():
             created_dirs.add(dirname)
 
             yield dict(
-                basename=dirname,
-                targets=[dirname],
+                name=dirname,
                 clean=True,
-                actions=[doit.tools.create_folder, dirname],
+                actions=[(doit.tools.create_folder, (dirname,))],
                 uptodate=[doit.tools.run_once]
             )
 
         yield dict(
-            basename=txt_path,
+            name=txt_path,
             file_dep=[pdf_path],
-            task_dep=[dirname],
+            task_dep=['extract:' + dirname],
             targets=[txt_path],
             clean=True,
             actions=[[PDFTOTEXT, '-table', pdf_path, txt_path]],
@@ -47,7 +46,7 @@ def task_extract():
 
         yml_path = out_base_path + '.yml'
         yield dict(
-            basename=yml_path,
+            name=yml_path,
             file_dep=[txt_path],
             targets=[yml_path],
             clean=True,
@@ -57,7 +56,7 @@ def task_extract():
 
     xlsx_path = os.path.join(OUTPUT_DIR, 'expenses.xlsx')
     yield dict(
-        basename=xlsx_path,
+        name=xlsx_path,
         file_dep=yml_paths,
         targets=[xlsx_path],
         clean=True,
