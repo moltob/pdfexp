@@ -1,5 +1,6 @@
 """Common fixtures and configurations for this test directory."""
 import os
+import shutil
 
 import pytest
 
@@ -11,3 +12,12 @@ def cwd_module_dir():
     os.chdir(os.path.dirname(__file__))
     yield
     os.chdir(cwd)
+
+
+@pytest.fixture(scope='module')
+def output_dir(cwd_module_dir):
+    path = 'output'
+    shutil.rmtree(path, ignore_errors=True)
+    os.makedirs(path)
+    yield path
+    shutil.rmtree(path, ignore_errors=False)

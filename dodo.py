@@ -52,7 +52,11 @@ def task_extract():
             file_dep=[txt_path],
             targets=[yml_path],
             clean=True,
-            actions=[(recognize_pdf_text, (), {'pdf_path': pdf_path})],
+            actions=[(recognize_pdf_text, (), {
+                'pdf_path': pdf_path,
+                'txt_path': txt_path,
+                'yml_path': yml_path,
+            })],
         )
         yml_paths.append(yml_path)
 

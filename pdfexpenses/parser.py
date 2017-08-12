@@ -45,12 +45,7 @@ CONTENT_TYPES = [
 CONTENT_TYPE_BY_NAME = {t.name: t for t in CONTENT_TYPES}
 
 
-def recognize_pdf_text(dependencies, targets, pdf_path):
-    assert len(dependencies) == 1
-    assert len(targets) == 1
-    txt_path = next(iter(dependencies))
-    yml_path = targets[0]
-
+def recognize_pdf_text(txt_path, yml_path, pdf_path):
     with open(txt_path, 'rt') as txt_file:
         txt = txt_file.read()
 
@@ -62,7 +57,7 @@ def recognize_pdf_text(dependencies, targets, pdf_path):
         if content_type.match(txt):
             data.update(content_type.extract(txt))
             with open(yml_path, 'wt') as yml_file:
-                yaml.dump(data, yml_file)
+                yaml.dump(data, yml_file, default_flow_style=False)
             return
 
     raise RecognitionFailedError(txt_path)
