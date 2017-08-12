@@ -1,8 +1,9 @@
 import glob
-
 import os
 
-PDFTOTEXT = r'D:\Work\dms\parsepdf\xpdf-tools-win-4.00\bin64\pdftotext.exe'
+import doit.tools
+
+PDFTOTEXT = r'pdftotext.exe'
 
 INPUT_DIR = r'q:\Privat\Rechnungen\00_Sonstige'
 OUTPUT_DIR = r'd:\Temp\dodoout'
@@ -14,6 +15,7 @@ def task_extract():
     """Extract invoice data from PDF."""
 
     yml_paths = []
+    created_dirs = set()
 
     for pdf_path in PDF_PATHS:
         rel_path = os.path.relpath(pdf_path, INPUT_DIR)
@@ -23,15 +25,24 @@ def task_extract():
         txt_path = out_base_path + '.txt'
         dirname = os.path.dirname(txt_path)
 
+        if dirname not in created_dirs:
+            created_dirs.add(dirname)
+
+            yield dict(
+                basename=dirname,
+                targets=[dirname],
+                clean=True,
+                actions=[doit.tools.create_folder, dirname],
+                uptodate=[doit.tools.run_once]
+            )
+
         yield dict(
             basename=txt_path,
             file_dep=[pdf_path],
+            task_dep=[dirname],
             targets=[txt_path],
             clean=True,
-            actions=[
-                'if not exist "%s" mkdir "%s"' % (dirname, dirname),
-                [PDFTOTEXT, '-table', pdf_path, txt_path]
-            ],
+            actions=[[PDFTOTEXT, '-table', pdf_path, txt_path]],
         )
 
         yml_path = out_base_path + '.yml'
