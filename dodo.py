@@ -37,6 +37,7 @@ def task_extract():
                 yield dict(
                     name=dirname,
                     clean=True,
+                    targets=[dirname],
                     actions=[(doit.tools.create_folder, (dirname,))],
                     uptodate=[doit.tools.run_once]
                 )
