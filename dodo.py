@@ -3,6 +3,7 @@ import os
 
 import doit.tools
 
+from pdfexpenses.export import export_expenses
 from pdfexpenses.recognition import recognize_pdf_text
 
 PDFTOTEXT = r'pdftotext.exe'
@@ -71,7 +72,7 @@ def task_extract():
         file_dep=yml_paths,
         targets=[xlsx_path],
         clean=True,
-        actions=['echo REPORT > %(targets)s']
+        actions=[export_expenses]
     )
 
 

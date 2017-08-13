@@ -2,3 +2,4 @@ pytest
 PyYAML
 pydoit
 attrs
+XlsxWriter

@@ -3,13 +3,15 @@ import re
 import attr
 import yaml
 
+from pdfexpenses.expenses import Category, Expense
+
 
 class RecognitionFailedError(Exception):
     """Recognition of the file typ failed."""
 
 
 @attr.s
-class ContentType:
+class Recognizer:
     """Recognition of and data extraction from (PDF) text content.
 
     Attributes:
@@ -21,32 +23,40 @@ class ContentType:
     matched. Failure to match is an error. The matched captures then form the extracted data set.
     """
     name = attr.ib()
+    category = attr.ib()
     selector = attr.ib()
     extractor = attr.ib()
 
     def match(self, txt):
         return re.search(self.selector, txt, re.MULTILINE | re.DOTALL) is not None
 
-    def extract(self, txt):
+    def extract(self, txt, *, source_document=None):
         match = re.search(self.extractor, txt, re.MULTILINE | re.DOTALL)
         if not match:
             raise RecognitionFailedError(self.name)
 
-        data = dict(recognizer=self.name)
-        data.update(match.groupdict())
-        return data
+        expense = Expense(
+            recognizer_name=self.name,
+            category=self.category.name,
+            source_document=source_document,
+            **match.groupdict()
+        )
+
+        return expense
 
 
 CONTENT_TYPES = [
-    ContentType(
+    Recognizer(
         'Saal',
+        Category.EXTERNAL_SERVICE,
         r'www\.saal-digital\.de',
-        r'Rechnungsdatum\:\s*(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamtbetrag\:\s*(?P<total>\d+,\d{2})'
+        r'Rechnungsdatum\:\s*(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamtbetrag\:\s*(?P<amount>\d+,\d{2})'
     ),
-    ContentType(
+    Recognizer(
         'Post',
+        Category.POSTAGE_COSTS,
         r'Deutsche\s+Post\s+AG.*Postwertzeichen\s+ohne\s+Zuschlag',
-        r'(?P<date>\d{2}\.\d{2}\.\d{2}).*Bruttoumsatz\s+\*(?P<total>\d+,\d{2})\s+EUR'
+        r'(?P<date>\d{2}\.\d{2}\.\d{2}).*Bruttoumsatz\s+\*(?P<amount>\d+,\d{2})\s+EUR'
     )
 ]
 
@@ -57,15 +67,10 @@ def recognize_pdf_text(txt_path, yml_path, pdf_path):
     with open(txt_path, 'rt') as txt_file:
         txt = txt_file.read()
 
-    data = {
-        'original': pdf_path
-    }
-
     for content_type in CONTENT_TYPES:
         if content_type.match(txt):
-            data.update(content_type.extract(txt))
-            with open(yml_path, 'wt') as yml_file:
-                yaml.dump(data, yml_file, default_flow_style=False)
+            expense = content_type.extract(txt, source_document=pdf_path)
+            expense.to_yaml(yml_path)
             return
 
     raise RecognitionFailedError(txt_path)
