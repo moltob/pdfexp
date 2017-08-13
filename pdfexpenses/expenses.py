@@ -6,6 +6,7 @@ import yaml
 
 def convert_amount(value):
     if isinstance(value, str):
+        # this is a mean locale handling shortcut, but let's see whether we hit the bad cases:
         value = float(value.replace(',', '.'))
     return value
 
