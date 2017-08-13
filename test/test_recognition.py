@@ -46,6 +46,19 @@ def test__content_type__tintenalarm():
     assert expense.category == 'OFFICE_SUPPLIES'
 
 
+def test__content_type__pixum():
+    with open('inputs/Pixum.txt', 'rt') as txtfile:
+        txt = txtfile.read()
+
+    content_type = CONTENT_TYPE_BY_NAME['Pixum']
+    assert content_type.match(txt)
+
+    expense = content_type.extract(txt)
+    assert expense.amount == 148.37
+    assert expense.date == datetime.date(2016, 12, 18)
+    assert expense.category == 'EXTERNAL_SERVICE'
+
+
 def test__recognize_pdf_text__saal(output_dir):
     yml_path = os.path.join(output_dir, 'Saal.yml')
     recognize_pdf_text('inputs/Saal_OCR.txt', yml_path, r'q:\folder 1\Saal.pdf')

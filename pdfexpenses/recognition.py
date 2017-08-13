@@ -63,7 +63,13 @@ CONTENT_TYPES = [
         Category.OFFICE_SUPPLIES,
         r'tintenalarm',
         r'(?P<date>\d{2}\.\d{2}\.\d{4}).*Summe\:\s+(?P<amount>\d+,\d{2})\s+'
-    )
+    ),
+    Recognizer(
+        'Pixum',
+        Category.EXTERNAL_SERVICE,
+        r'Pixum',
+        r'(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamt EUR\:\s+(?P<amount>\d+,\d{2})\s+'
+    ),
 ]
 
 CONTENT_TYPE_BY_NAME = {t.name: t for t in CONTENT_TYPES}
