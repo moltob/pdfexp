@@ -17,10 +17,15 @@ class ExpenseReport:
     def export_xlsx(self, path):
         self.expenses = [Expense.from_yaml(p) for p in self.yml_paths]
         workbook = xlsxwriter.Workbook(path)
-        self.report_expenses(workbook.add_worksheet("Expenses"))
+        self.report_expenses(workbook)
         workbook.close()
 
-    def report_expenses(self, worksheet):
+    def report_expenses(self, workbook):
+        worksheet = workbook.add_worksheet("Expenses")
+        currency_format = workbook.add_format({
+            'num_format': 0x08,  # built-in currency with red negatives
+        })
+
         data = [[
             e.category,
             e.recognizer_name,
@@ -30,5 +35,19 @@ class ExpenseReport:
         ] for e in self.expenses]
 
         worksheet.add_table(0, 0, len(data), 4, {
-            'data': data
+            'data': data,
+            'total_row': True,
+            'columns': [{
+                'header': "Category",
+            }, {
+                'header': "Document Type",
+            }, {
+                'header': "Date",
+            }, {
+                'header': "Amount",
+                'format': currency_format,
+                'total_function': 'sum',
+            }, {
+                'header': "Source Document",
+            }]
         })

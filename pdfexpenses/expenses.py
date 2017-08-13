@@ -4,13 +4,19 @@ import attr
 import yaml
 
 
+def convert_amount(value):
+    if isinstance(value, str):
+        value = float(value.replace(',', '.'))
+    return value
+
+
 @attr.s
 class Expense:
     source_document = attr.ib()
     recognizer_name = attr.ib()
     category = attr.ib()
     date = attr.ib()
-    amount = attr.ib()
+    amount = attr.ib(convert=convert_amount)
 
     def to_yaml(self, yml_path):
         with open(yml_path, 'wt') as yml_file:
