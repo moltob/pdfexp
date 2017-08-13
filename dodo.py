@@ -3,7 +3,7 @@ import os
 
 import doit.tools
 
-from pdfexpenses.recognizer import recognize_pdf_text
+from pdfexpenses.recognition import recognize_pdf_text
 
 PDFTOTEXT = r'pdftotext.exe'
 
