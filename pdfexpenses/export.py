@@ -40,6 +40,7 @@ class ExpenseReport:
         ] for e in self.expenses]
 
         worksheet.add_table(0, 0, len(data), 4, {
+            'style': 'Table Style Light 18',
             'data': data,
             'total_row': True,
             'columns': [{
