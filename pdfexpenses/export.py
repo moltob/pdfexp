@@ -22,9 +22,10 @@ class ExpenseReport:
 
     def report_expenses(self, workbook):
         worksheet = workbook.add_worksheet("Expenses")
-        currency_format = workbook.add_format({
-            'num_format': 0x08,  # built-in currency with red negatives
-        })
+
+        # built-in formats:
+        currency_format = workbook.add_format({'num_format': 0x08})
+        date_format = workbook.add_format({'num_format': 0x0E})
 
         worksheet.set_column(0, 0, 25)
         worksheet.set_column(1, 1, 20)
@@ -49,6 +50,7 @@ class ExpenseReport:
                 'header': "Document Type",
             }, {
                 'header': "Date",
+                'format': date_format,
             }, {
                 'header': "Amount",
                 'format': currency_format,
