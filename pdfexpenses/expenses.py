@@ -51,3 +51,4 @@ class Category(enum.Enum):
     EXTERNAL_SERVICE = 1  # German: Fremdleistung
     POSTAGE_COSTS = 2  # German: Portokosten
     DEPRECIATION = 3  # German: Abschreibung
+    OFFICE_SUPPLIES = 4  # German: Büroartikel

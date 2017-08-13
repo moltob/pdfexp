@@ -57,6 +57,12 @@ CONTENT_TYPES = [
         Category.POSTAGE_COSTS,
         r'Deutsche\s+Post\s+AG.*Postwertzeichen\s+ohne\s+Zuschlag',
         r'(?P<date>\d{2}\.\d{2}\.\d{2}).*Bruttoumsatz\s+\*(?P<amount>\d+,\d{2})\s+EUR'
+    ),
+    Recognizer(
+        'Tintenalarm',
+        Category.OFFICE_SUPPLIES,
+        r'tintenalarm',
+        r'(?P<date>\d{2}\.\d{2}\.\d{4}).*Summe\:\s+(?P<amount>\d+,\d{2})\s+'
     )
 ]
 

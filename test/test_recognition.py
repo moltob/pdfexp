@@ -33,6 +33,19 @@ def test__content_type__post():
     assert expense.date == datetime.date(2017, 1, 2)
 
 
+def test__content_type__tintenalarm():
+    with open('inputs/Tintenalarm.txt', 'rt') as txtfile:
+        txt = txtfile.read()
+
+    content_type = CONTENT_TYPE_BY_NAME['Tintenalarm']
+    assert content_type.match(txt)
+
+    expense = content_type.extract(txt)
+    assert expense.amount == 45.69
+    assert expense.date == datetime.date(2017, 2, 8)
+    assert expense.category == 'OFFICE_SUPPLIES'
+
+
 def test__recognize_pdf_text__saal(output_dir):
     yml_path = os.path.join(output_dir, 'Saal.yml')
     recognize_pdf_text('inputs/Saal_OCR.txt', yml_path, r'q:\folder 1\Saal.pdf')
