@@ -1,6 +1,7 @@
 import enum
 
 import attr
+import datetime
 import yaml
 
 
@@ -11,12 +12,27 @@ def convert_amount(value):
     return value
 
 
+def convert_date(value):
+    if isinstance(value, str):
+        for fmt in {'%d.%m.%y', '%d.%m.%Y'}:
+            try:
+                value = datetime.datetime.strptime(value, fmt).date()
+                break
+            except ValueError:
+                # try next format:
+                pass
+        else:
+            raise ValueError(f'Cannot parse date format {value!r}.')
+
+    return value
+
+
 @attr.s
 class Expense:
     source_document = attr.ib()
     recognizer_name = attr.ib()
     category = attr.ib()
-    date = attr.ib()
+    date = attr.ib(convert=convert_date)
     amount = attr.ib(convert=convert_amount)
 
     def to_yaml(self, yml_path):

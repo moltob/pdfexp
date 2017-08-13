@@ -1,5 +1,6 @@
 import os
 
+import datetime
 import yaml
 
 from pdfexpenses.expenses import Expense
@@ -17,7 +18,7 @@ def test__content_type__saal():
     assert expense.recognizer_name == 'Saal'
     assert expense.category == 'EXTERNAL_SERVICE'
     assert expense.amount == 11.1
-    assert expense.date == '10.07.2017'
+    assert expense.date == datetime.date(2017, 7, 10)
 
 
 def test__content_type__post():
@@ -29,7 +30,7 @@ def test__content_type__post():
 
     expense = content_type.extract(txt)
     assert expense.amount == 3
-    assert expense.date == '02.01.17'
+    assert expense.date == datetime.date(2017, 1, 2)
 
 
 def test__recognize_pdf_text__saal(output_dir):
@@ -38,5 +39,5 @@ def test__recognize_pdf_text__saal(output_dir):
     expense = Expense.from_yaml(yml_path)
 
     assert expense.amount == 11.1
-    assert expense.date == '10.07.2017'
+    assert expense.date == datetime.date(2017, 7, 10)
     assert expense.source_document == r'q:\folder 1\Saal.pdf'
