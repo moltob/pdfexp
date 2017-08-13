@@ -12,7 +12,7 @@ INPUT_DIRS = [
     r'q:\Britta Pagel Fotografie\Fremdleistungen',
     r'q:\Britta Pagel Fotografie\Portokosten',
 ]
-OUTPUT_DIR = r'd:\Temp\dodoout'
+OUTPUT_DIR = r'x:\BPF Ausgaben'
 
 
 def task_extract():
