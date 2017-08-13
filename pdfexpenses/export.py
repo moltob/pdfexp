@@ -39,7 +39,7 @@ class ExpenseReport:
             e.recognizer_name,
             e.date,
             e.amount,
-            e.source_document,
+            'external:' + e.source_document,
         ] for e in sorted(self.expenses, key=operator.attrgetter('date'))]
 
         worksheet.add_table(0, 0, len(data) + 1, 4, {
