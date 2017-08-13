@@ -26,6 +26,11 @@ class ExpenseReport:
             'num_format': 0x08,  # built-in currency with red negatives
         })
 
+        worksheet.set_column(0, 0, 25)
+        worksheet.set_column(1, 1, 20)
+        worksheet.set_column(2, 3, 12)
+        worksheet.set_column(4, 4, 100)
+
         data = [[
             e.category,
             e.recognizer_name,
