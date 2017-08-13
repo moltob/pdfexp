@@ -1,3 +1,5 @@
+import operator
+
 import attr
 import xlsxwriter
 import yaml
@@ -38,9 +40,9 @@ class ExpenseReport:
             e.date,
             e.amount,
             e.source_document,
-        ] for e in self.expenses]
+        ] for e in sorted(self.expenses, key=operator.attrgetter('date'))]
 
-        worksheet.add_table(0, 0, len(data), 4, {
+        worksheet.add_table(0, 0, len(data) + 1, 4, {
             'style': 'Table Style Light 18',
             'data': data,
             'total_row': True,
