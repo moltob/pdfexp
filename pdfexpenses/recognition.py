@@ -1,9 +1,11 @@
+import logging
 import re
 
 import attr
-import yaml
 
 from pdfexpenses.expenses import Category, Expense
+
+_logger = logging.getLogger(__name__)
 
 
 class RecognitionFailedError(Exception):
@@ -76,13 +78,18 @@ CONTENT_TYPE_BY_NAME = {t.name: t for t in CONTENT_TYPES}
 
 
 def recognize_pdf_text(txt_path, yml_path, pdf_path):
+    _logger.info(f'Extracting expense data from {pdf_path!r}.')
     with open(txt_path, 'rt') as txt_file:
         txt = txt_file.read()
 
     for content_type in CONTENT_TYPES:
         if content_type.match(txt):
+            _logger.debug(f'Content type {content_type.name!r} marching.')
             expense = content_type.extract(txt, source_document=pdf_path)
             expense.to_yaml(yml_path)
             return
 
+        _logger.debug(f'Content type {content_type.name!r} not marching.')
+
+    _logger.error(f'Content type recognition failed for {pdf_path!r}.')
     raise RecognitionFailedError(txt_path)

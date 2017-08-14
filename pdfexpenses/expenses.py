@@ -1,8 +1,11 @@
+import datetime
 import enum
+import logging
 
 import attr
-import datetime
 import yaml
+
+_logger = logging.getLogger(__name__)
 
 
 def convert_amount(value):
@@ -36,11 +39,13 @@ class Expense:
     amount = attr.ib(convert=convert_amount)
 
     def to_yaml(self, yml_path):
+        _logger.debug(f'Writing expense to {yml_path!r}.')
         with open(yml_path, 'wt') as yml_file:
             yaml.dump(attr.asdict(self), yml_file, default_flow_style=False)
 
     @classmethod
     def from_yaml(cls, yml_path):
+        _logger.debug(f'Reading expense from {yml_path!r}.')
         with open(yml_path, 'rt') as yml_file:
             data = yaml.load(yml_file)
             expense = cls(**data)

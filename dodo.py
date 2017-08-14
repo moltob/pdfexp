@@ -1,7 +1,11 @@
 import glob
+import logging
 import os
 
+import colorama
+import daiquiri
 import doit.tools
+import sys
 
 from pdfexpenses.export import export_expenses
 from pdfexpenses.recognition import recognize_pdf_text
@@ -14,6 +18,12 @@ INPUT_DIRS = [
 ]
 OUTPUT_DIR = r'x:\BPF Ausgaben'
 
+# enable colored output on Windows and explicitly pass colorama-wrapped std stream to logger lib:
+colorama.init()
+daiquiri.setup(level=logging.DEBUG, outputs=[daiquiri.output.Stream(sys.stderr)])
+
+_logger = logging.getLogger(__name__)
+
 
 def task_extract():
     """Extract invoice data from PDF."""
@@ -22,7 +32,8 @@ def task_extract():
     created_dirs = set()
 
     for index, input_dir in enumerate(INPUT_DIRS):
-        pdf_paths = glob.glob(os.path.join(input_dir, '**', '*.pdf'), recursive=True)
+        _logger.info(f'Collecting PDF documents in {input_dir!r}')
+        pdf_paths = glob.iglob(os.path.join(input_dir, '**', '*.pdf'), recursive=True)
 
         for pdf_path in pdf_paths:
             rel_path = os.path.relpath(pdf_path, input_dir)

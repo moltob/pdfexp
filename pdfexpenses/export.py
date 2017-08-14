@@ -1,3 +1,4 @@
+import logging
 import operator
 
 import attr
@@ -5,6 +6,8 @@ import xlsxwriter
 import yaml
 
 from pdfexpenses.expenses import Expense, Category
+
+_logger = logging.getLogger(__name__)
 
 
 def export_expenses(dependencies, targets):
@@ -17,6 +20,7 @@ class ExpenseReport:
     expenses = None
 
     def export_xlsx(self, path):
+        _logger.info(f'Writing expense report to {path!r}.')
         self.expenses = [Expense.from_yaml(p) for p in self.yml_paths]
         workbook = xlsxwriter.Workbook(path)
         self.report_expenses(workbook)
