@@ -63,7 +63,7 @@ class Recognizer:
         m = PATTERN_DATE_PAID.search(path)
         if m:
             date = datetime.datetime.strptime(m.group('date'), '%Y-%m-%d').date()
-            _logger.debug(r'Payment date overriden for {path!r}: {date}.')
+            _logger.debug(f'Payment date overriden for {path!r}: {date}.')
             expense.date = date
 
 
