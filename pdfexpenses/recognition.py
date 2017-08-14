@@ -2,6 +2,9 @@ import logging
 import re
 
 import attr
+import os
+
+import datetime
 
 from pdfexpenses.expenses import Category, Expense
 
@@ -10,6 +13,9 @@ _logger = logging.getLogger(__name__)
 
 class RecognitionFailedError(Exception):
     """Recognition of the file typ failed."""
+
+
+PATTERN_DATE_PAID = re.compile(r'_BEZ(?P<date>\d{4}-\d{2}-\d{2})')
 
 
 @attr.s
@@ -43,8 +49,22 @@ class Recognizer:
             source_document=source_document,
             **match.groupdict()
         )
+        self.process_filename_tags(source_document, expense)
 
         return expense
+
+    @staticmethod
+    def process_filename_tags(path, expense):
+        if not path:
+            return
+
+        _, filename = os.path.split(path)
+
+        m = PATTERN_DATE_PAID.search(path)
+        if m:
+            date = datetime.datetime.strptime(m.group('date'), '%Y-%m-%d').date()
+            _logger.debug(r'Payment date overriden for {path!r}: {date}.')
+            expense.date = date
 
 
 CONTENT_TYPES = [
