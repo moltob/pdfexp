@@ -77,7 +77,7 @@ CONTENT_TYPES = [
     Recognizer(
         'Post',
         Category.POSTAGE_COSTS,
-        r'Deutsche\s+Post\s+AG.*Postwertzeichen\s+ohne\s+Zuschlag',
+        r'Deutsche\s+Post',
         r'(?P<date>\d{2}\.\d{2}\.\d{2}).*Bruttoumsatz\s+\*(?P<amount>\d+,\d{2})\s+EUR'
     ),
     Recognizer(
@@ -104,12 +104,12 @@ def recognize_pdf_text(txt_path, yml_path, pdf_path):
 
     for content_type in CONTENT_TYPES:
         if content_type.match(txt):
-            _logger.debug(f'Content type {content_type.name!r} marching.')
+            _logger.debug(f'Content type {content_type.name!r} matching.')
             expense = content_type.extract(txt, source_document=pdf_path)
             expense.to_yaml(yml_path)
             return
 
-        _logger.debug(f'Content type {content_type.name!r} not marching.')
+        _logger.debug(f'Content type {content_type.name!r} not matching.')
 
     _logger.error(f'Content type recognition failed for {pdf_path!r}.')
     raise RecognitionFailedError(txt_path)
