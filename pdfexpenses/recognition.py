@@ -6,6 +6,8 @@ import os
 
 import datetime
 
+import colorama
+
 from pdfexpenses.expenses import Category, Expense
 
 _logger = logging.getLogger(__name__)
@@ -15,7 +17,10 @@ class RecognitionFailedError(Exception):
     """Recognition of the file typ failed."""
 
 
-PATTERN_DATE_PAID = re.compile(r'_BEZ(?P<date>\d{4}-\d{2}-\d{2})')
+FILENAME_PATTERN_DATE_PAID = re.compile(r'_BEZ(?P<date>\d{4}-\d{2}-\d{2})')
+TEXT_PATTERN_FALLBACK_DATE = re.compile(r'(?P<date>\d{2}\.\d{2}\.\d{2}(\d{2})?)')
+TEXT_PATTERN_FALLBACK_AMOUNT = re.compile(r'([Gg]}esamt|[Ee]ndsumme|[Ee]ndbetrag)\s*:\s+'
+                                          r'(?P<amount>\d+,\d{2})')
 
 
 @attr.s
@@ -60,7 +65,7 @@ class Recognizer:
 
         _, filename = os.path.split(path)
 
-        m = PATTERN_DATE_PAID.search(path)
+        m = FILENAME_PATTERN_DATE_PAID.search(path)
         if m:
             date = datetime.datetime.strptime(m.group('date'), '%Y-%m-%d').date()
             _logger.debug(f'Payment date overriden for {path!r}: {date}.')
@@ -72,7 +77,7 @@ CONTENT_TYPES = [
         'Saal',
         Category.EXTERNAL_SERVICE,
         r'www\.saal-digital\.de',
-        r'Rechnungsdatum\:\s*(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamtbetrag\:\s*(?P<amount>\d+,\d{2})'
+        r'Rechnungsdatum:\s*(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamtbetrag:\s*(?P<amount>\d+,\d{2})'
     ),
     Recognizer(
         'Post',
@@ -84,13 +89,13 @@ CONTENT_TYPES = [
         'Tintenalarm',
         Category.OFFICE_SUPPLIES,
         r'tintenalarm',
-        r'(?P<date>\d{2}\.\d{2}\.\d{4}).*Summe\:\s+(?P<amount>\d+,\d{2})\s+'
+        r'(?P<date>\d{2}\.\d{2}\.\d{4}).*Summe:\s+(?P<amount>\d+,\d{2})\s+'
     ),
     Recognizer(
         'Pixum',
         Category.EXTERNAL_SERVICE,
         r'Pixum',
-        r'(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamt EUR\:\s+(?P<amount>\d+,\d{2})\s+'
+        r'(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamt EUR:\s+(?P<amount>\d+,\d{2})\s+'
     ),
 ]
 
@@ -111,5 +116,26 @@ def recognize_pdf_text(txt_path, yml_path, pdf_path):
 
         _logger.debug(f'Content type {content_type.name!r} not matching.')
 
-    _logger.error(f'Content type recognition failed for {pdf_path!r}.')
-    raise RecognitionFailedError(txt_path)
+    _logger.warning(f'Content type recognition failed for {pdf_path!r}.')
+    prepare_expense_template(txt, yml_path, pdf_path)
+
+
+def prepare_expense_template(txt, yml_path, pdf_path):
+    # try to find a fallback values in document:
+    m = TEXT_PATTERN_FALLBACK_DATE.search(txt)
+    date = m.group('date') if m else datetime.date.today()
+
+    m = TEXT_PATTERN_FALLBACK_AMOUNT.search(txt)
+    amount = m.group('amount') if m else '0,00'
+
+    expense = Expense(
+        source_document=pdf_path,
+        recognizer_name='Manual',
+        category=Category.UNDEFINED.name,
+        date=date,
+        amount=amount
+    )
+    expense.to_yaml(yml_path)
+
+    _logger.warning(f'Please prepare a manual expense and save it next to the original document. '
+                    f'You can take the template from {yml_path!r}.')

@@ -12,10 +12,9 @@ from pdfexpenses.recognition import recognize_pdf_text
 
 PDFTOTEXT = r'pdftotext.exe'
 
-INPUT_DIRS = [
-    r'q:\Britta Pagel Fotografie\Fremdleistungen',
-    r'q:\Britta Pagel Fotografie\Portokosten',
-]
+INPUT_DIRS = (
+    r'q:\Britta Pagel Fotografie',
+)
 OUTPUT_DIR = r'x:\BPF Ausgaben'
 
 _logger = logging.getLogger(__name__)

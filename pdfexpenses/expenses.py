@@ -53,6 +53,7 @@ class Expense:
 
 
 class Category(enum.Enum):
+    UNDEFINED = 0
     EXTERNAL_SERVICE = 1  # German: Fremdleistung
     POSTAGE_COSTS = 2  # German: Portokosten
     DEPRECIATION = 3  # German: Abschreibung
