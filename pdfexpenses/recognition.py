@@ -131,7 +131,7 @@ class ExpenseExtractor:
     def prepare_expense_template(self, txt, yml_path, pdf_path, content_type=None):
         # try to find a fallback values in document:
         m = TEXT_PATTERN_FALLBACK_DATE.search(txt)
-        date = m.group('date') if m else datetime.date.today()
+        date = m.group('date') if m else datetime.date(1900, 1, 1)
 
         m = TEXT_PATTERN_FALLBACK_AMOUNT.search(txt)
         amount = m.group('amount') if m else '0,00'
