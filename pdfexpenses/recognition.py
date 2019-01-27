@@ -103,43 +103,50 @@ CONTENT_TYPES = [
 CONTENT_TYPE_BY_NAME = {t.name: t for t in CONTENT_TYPES}
 
 
-def recognize_pdf_text(txt_path, yml_path, pdf_path):
-    _logger.info(f'Extracting expense data from {pdf_path!r}.')
-    with open(txt_path, 'rt') as txt_file:
-        txt = txt_file.read()
+class ExpenseExtractor:
 
-    for content_type in CONTENT_TYPES:
-        if content_type.match(txt):
-            try:
-                _logger.debug(f'Content type {content_type.name!r} matching.')
-                expense = content_type.extract(txt, source_document=pdf_path)
-                expense.to_yaml(yml_path)
-                return
-            except RecognitionFailedError:
-                prepare_expense_template(txt, yml_path, pdf_path, content_type)
+    def __init__(self):
+        self.prepared_expense_templates = []
 
-        _logger.debug(f'Content type {content_type.name!r} not matching.')
-    else:
-        _logger.warning(f'Content type recognition failed for {pdf_path!r}.')
-        prepare_expense_template(txt, yml_path, pdf_path)
+    def recognize_pdf_text(self, txt_path, yml_path, pdf_path):
+        _logger.info(f'Extracting expense data from {pdf_path!r}.')
+        with open(txt_path, 'rt') as txt_file:
+            txt = txt_file.read()
 
+        for content_type in CONTENT_TYPES:
+            if content_type.match(txt):
+                try:
+                    _logger.debug(f'Content type {content_type.name!r} matching.')
+                    expense = content_type.extract(txt, source_document=pdf_path)
+                    expense.to_yaml(yml_path)
+                    return
+                except RecognitionFailedError:
+                    self.prepare_expense_template(txt, yml_path, pdf_path, content_type)
 
-def prepare_expense_template(txt, yml_path, pdf_path, content_type=None):
-    # try to find a fallback values in document:
-    m = TEXT_PATTERN_FALLBACK_DATE.search(txt)
-    date = m.group('date') if m else datetime.date.today()
+            _logger.debug(f'Content type {content_type.name!r} not matching.')
+        else:
+            _logger.warning(f'Content type recognition failed for {pdf_path!r}.')
+            self.prepare_expense_template(txt, yml_path, pdf_path)
 
-    m = TEXT_PATTERN_FALLBACK_AMOUNT.search(txt)
-    amount = m.group('amount') if m else '0,00'
+    def prepare_expense_template(self, txt, yml_path, pdf_path, content_type=None):
+        # try to find a fallback values in document:
+        m = TEXT_PATTERN_FALLBACK_DATE.search(txt)
+        date = m.group('date') if m else datetime.date.today()
 
-    expense = Expense(
-        source_document=pdf_path,
-        recognizer_name=content_type.name if content_type else 'Manual',
-        category=Category.UNDEFINED.name,
-        date=date,
-        amount=amount
-    )
-    expense.to_yaml(yml_path)
+        m = TEXT_PATTERN_FALLBACK_AMOUNT.search(txt)
+        amount = m.group('amount') if m else '0,00'
 
-    _logger.warning(f'Please prepare a manual expense and save it next to the original document. '
-                    f'You can take the template from {yml_path!r}.')
+        expense = Expense(
+            source_document=pdf_path,
+            recognizer_name=content_type.name if content_type else 'Manual',
+            category=Category.UNDEFINED.name,
+            date=date,
+            amount=amount
+        )
+        expense.to_yaml(yml_path)
+        self.prepared_expense_templates.append(yml_path)
+
+        _logger.warning(
+            f'Please prepare a manual expense and save it next to the original document. '
+            f'You can take the template from {yml_path!r}.'
+        )

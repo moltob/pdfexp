@@ -4,7 +4,7 @@ import datetime
 import yaml
 
 from pdfexpenses.expenses import Expense
-from pdfexpenses.recognition import CONTENT_TYPE_BY_NAME, recognize_pdf_text
+from pdfexpenses.recognition import CONTENT_TYPE_BY_NAME, ExpenseExtractor
 
 
 def test__content_type__saal():
@@ -61,7 +61,7 @@ def test__content_type__pixum():
 
 def test__recognize_pdf_text__saal(output_dir):
     yml_path = os.path.join(output_dir, 'Saal.yml')
-    recognize_pdf_text('inputs/Saal_OCR.txt', yml_path, r'q:\folder 1\Saal.pdf')
+    ExpenseExtractor().recognize_pdf_text('inputs/Saal_OCR.txt', yml_path, r'q:\folder 1\Saal.pdf')
     expense = Expense.from_yaml(yml_path)
 
     assert expense.amount == 11.1
@@ -71,8 +71,10 @@ def test__recognize_pdf_text__saal(output_dir):
 
 def test__recognize_pdf_text__overridden_date(output_dir):
     yml_path = os.path.join(output_dir, 'Pixum_BEZ2017-01-03.yml')
-    recognize_pdf_text('inputs/Pixum_BEZ2017-01-03.txt',
-                       yml_path,
-                       r'q:\folder 1\Pixum_BEZ2017-01-03.pdf')
+    ExpenseExtractor().recognize_pdf_text(
+        'inputs/Pixum_BEZ2017-01-03.txt',
+        yml_path,
+        r'q:\folder 1\Pixum_BEZ2017-01-03.pdf'
+    )
     expense = Expense.from_yaml(yml_path)
     assert expense.date == datetime.date(2017, 1, 3)

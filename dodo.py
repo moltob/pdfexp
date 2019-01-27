@@ -8,7 +8,7 @@ import daiquiri
 import doit.tools
 
 from pdfexpenses.export import export_expenses
-from pdfexpenses.recognition import recognize_pdf_text
+from pdfexpenses.recognition import ExpenseExtractor
 
 PDFTOTEXT = r'pdftotext.exe'
 
@@ -24,6 +24,7 @@ def task_extract():
     """Extract invoice data from PDF."""
     configure_logging()
 
+    extractor = ExpenseExtractor()
     yml_paths = []
     created_dirs = set()
 
@@ -71,7 +72,7 @@ def task_extract():
                     file_dep=[txt_path],
                     targets=[yml_path],
                     clean=True,
-                    actions=[(recognize_pdf_text, (), {
+                    actions=[(extractor.recognize_pdf_text, (), {
                         'pdf_path': pdf_path,
                         'txt_path': txt_path,
                         'yml_path': yml_path,
