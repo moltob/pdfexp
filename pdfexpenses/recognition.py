@@ -139,7 +139,7 @@ class ExpenseExtractor:
         expense = Expense(
             source_document=pdf_path,
             recognizer_name=content_type.name if content_type else 'Manual',
-            category=Category.UNDEFINED.name,
+            category=content_type.category.name if content_type else Category.UNDEFINED.name,
             date=date,
             amount=amount
         )
