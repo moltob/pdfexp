@@ -155,6 +155,6 @@ class ExpenseExtractor:
         if not self.prepared_expense_templates:
             return
 
-        _logger.info('The following expense templates have been prepared during last run:')
+        _logger.warning(f'{len(self.prepared_expense_templates)} expense templates prepared.')
         for template in self.prepared_expense_templates:
             _logger.info(f'  {template}')
