@@ -77,8 +77,8 @@ CONTENT_TYPES = [
     Recognizer(
         'Saal',
         Category.EXTERNAL_SERVICE,
-        r'www\.saal-digital\.de',
-        r'Rechnungsdatum:\s*(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamtbetrag:\s*(?P<amount>\d+,\d{2})'
+        r'(www\.saal-digital\.de|Saal-Digital Fotoservice GmbH)',
+        r'Rechnungsdatum:\s*(?P<date>\d{2}\.\d{2}\.\d{4}).*(Gesamt|Rechnungs)betrag:?\s*(?P<amount>\d+,\d{2})'
     ),
     Recognizer(
         'Post',

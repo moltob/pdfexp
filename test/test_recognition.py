@@ -21,6 +21,20 @@ def test__content_type__saal():
     assert expense.date == datetime.date(2017, 7, 10)
 
 
+def test__content_type__saal_new():
+    with open('inputs/Rechnung_11323155.txt', 'rt') as txtfile:
+        txt = txtfile.read()
+
+    content_type = CONTENT_TYPE_BY_NAME['Saal']
+    assert content_type.match(txt)
+
+    expense = content_type.extract(txt)
+    assert expense.recognizer_name == 'Saal'
+    assert expense.category == 'EXTERNAL_SERVICE'
+    assert expense.amount == 13.71
+    assert expense.date == datetime.date(2018, 7, 4)
+
+
 def test__content_type__post():
     with open('inputs/Post.txt', 'rt') as txtfile:
         txt = txtfile.read()
