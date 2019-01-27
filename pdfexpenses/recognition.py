@@ -150,3 +150,11 @@ class ExpenseExtractor:
             f'Please prepare a manual expense and save it next to the original document. '
             f'You can take the template from {yml_path!r}.'
         )
+
+    def print_prepared_expense_templates(self):
+        if not self.prepared_expense_templates:
+            return
+
+        _logger.info('The following expense templates have been prepared during last run:')
+        for template in self.prepared_expense_templates:
+            _logger.info(f'  {template}')

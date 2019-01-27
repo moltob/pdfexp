@@ -89,6 +89,13 @@ def task_extract():
         actions=[export_expenses]
     )
 
+    yield dict(
+        name='expense_templates',
+        file_dep=[xlsx_path],
+        actions=[extractor.print_prepared_expense_templates],
+    )
+
+
 
 def configure_logging():
     # enable colored output and explicitly pass colorama-wrapped std stream to logger lib:
