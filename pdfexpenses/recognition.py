@@ -46,6 +46,7 @@ class Recognizer:
     def extract(self, txt, *, source_document=None):
         match = re.search(self.extractor, txt, re.MULTILINE | re.DOTALL)
         if not match:
+            _logger.error(f'Recognizer {self.name!r} matched selector but not content.')
             raise RecognitionFailedError(self.name)
 
         expense = Expense(
@@ -109,18 +110,21 @@ def recognize_pdf_text(txt_path, yml_path, pdf_path):
 
     for content_type in CONTENT_TYPES:
         if content_type.match(txt):
-            _logger.debug(f'Content type {content_type.name!r} matching.')
-            expense = content_type.extract(txt, source_document=pdf_path)
-            expense.to_yaml(yml_path)
-            return
+            try:
+                _logger.debug(f'Content type {content_type.name!r} matching.')
+                expense = content_type.extract(txt, source_document=pdf_path)
+                expense.to_yaml(yml_path)
+                return
+            except RecognitionFailedError:
+                prepare_expense_template(txt, yml_path, pdf_path, content_type)
 
         _logger.debug(f'Content type {content_type.name!r} not matching.')
+    else:
+        _logger.warning(f'Content type recognition failed for {pdf_path!r}.')
+        prepare_expense_template(txt, yml_path, pdf_path)
 
-    _logger.warning(f'Content type recognition failed for {pdf_path!r}.')
-    prepare_expense_template(txt, yml_path, pdf_path)
 
-
-def prepare_expense_template(txt, yml_path, pdf_path):
+def prepare_expense_template(txt, yml_path, pdf_path, content_type=None):
     # try to find a fallback values in document:
     m = TEXT_PATTERN_FALLBACK_DATE.search(txt)
     date = m.group('date') if m else datetime.date.today()
@@ -130,7 +134,7 @@ def prepare_expense_template(txt, yml_path, pdf_path):
 
     expense = Expense(
         source_document=pdf_path,
-        recognizer_name='Manual',
+        recognizer_name=content_type.name if content_type else 'Manual',
         category=Category.UNDEFINED.name,
         date=date,
         amount=amount
