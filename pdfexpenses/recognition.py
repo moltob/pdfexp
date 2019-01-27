@@ -46,7 +46,7 @@ class Recognizer:
     def extract(self, txt, *, source_document=None):
         match = re.search(self.extractor, txt, re.MULTILINE | re.DOTALL)
         if not match:
-            _logger.error(f'Recognizer {self.name!r} matched selector but not content.')
+            _logger.warning(f'Recognizer {self.name!r} matched selector but not content.')
             raise RecognitionFailedError(self.name)
 
         expense = Expense(
@@ -119,9 +119,9 @@ class ExpenseExtractor:
                     _logger.debug(f'Content type {content_type.name!r} matching.')
                     expense = content_type.extract(txt, source_document=pdf_path)
                     expense.to_yaml(yml_path)
-                    return
                 except RecognitionFailedError:
                     self.prepare_expense_template(txt, yml_path, pdf_path, content_type)
+                break
 
             _logger.debug(f'Content type {content_type.name!r} not matching.')
         else:
