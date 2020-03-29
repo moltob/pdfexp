@@ -98,6 +98,12 @@ CONTENT_TYPES = [
         r'Pixum',
         r'(?P<date>\d{2}\.\d{2}\.\d{4}).*Gesamt EUR:\s+(?P<amount>\d+,\d{2})\s+'
     ),
+    Recognizer(
+        'Spamdrain',
+        Category.EXTERNAL_SERVICE,
+        r'SpamDrain',
+        r'Invoice date:\s+(?P<date>\d{2}\.\d{2}\.\d{2}).*Total incl. VAT\s+(?P<amount>\d+,\d{2})\s+'
+    ),
 ]
 
 CONTENT_TYPE_BY_NAME = {t.name: t for t in CONTENT_TYPES}
